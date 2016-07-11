@@ -47,6 +47,9 @@
           t/CopyInstruction
           (perform-copy one-instruction)
 
+          t/GitCheckout
+          (perform-git-checkout one-instruction)
+
           t/GitAdd
           (perform-git-add one-instruction)
 
@@ -99,8 +102,12 @@
     (jgit/with-repo repo (jgit/git-tag repo tag-message))))
 
 (s/defn ^:always-validate perform-git-push [instr :- t/GitPush]
-  (let [{:keys [remote branch]} {:git-push instr}]
+  (let [{:keys [remote branch]} (:git-push instr)]
     (jgit/with-repo repo (jgit/git-push))))
+
+(s/defn ^:always-validate perform-git-checkout [instr :- t/GitCheckout]
+  (let [{:keys [branch]} (:git-checkout instr)]
+    (jgit/with-repo repo (jgit/git-checkout branch))))
 
 (defmethod edit :yaml
   [_ _]

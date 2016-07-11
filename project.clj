@@ -15,4 +15,17 @@
                  [org.clojure/data.json        "0.2.6"]
                  ]
   :exclusions [commons-logging log4j org.slf4j/slf4j-log4j12]
+
+  :repositories [
+                 ["snapshots" {:url      "https://sforzando.artifactoryonline.com/sforzando/libs-snapshot-local"
+                               :username [:gpg :env/artifactory_user]
+                               :password [:gpg :env/artifactory_pwd]
+                               :snapshots true}]
+                 ["releases" {:url      "https://sforzando.artifactoryonline.com/sforzando/libs-release-local"
+                              :username [:gpg :env/artifactory_user]
+                              :password [:gpg :env/artifactory_pwd]}]
+                 ["plugins" {:url      "https://sforzando.artifactoryonline.com/sforzando/plugins-release"
+                             :username [:gpg :env/artifactory_user]
+                             :password [:gpg :env/artifactory_pwd]}]
+                 ]
   )

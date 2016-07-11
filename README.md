@@ -4,6 +4,16 @@ Clojure library designed to automate some git operations against a local filesys
 
 ## Usage
 
+The leiningen dependency is:
+
+```
+[clj-git-lib "0.1.0"]
+```
+
+```
+(:require [atomist.git :refer [perform]]
+```
+
 There is really just one function called `perform`:
 
 ```clj
