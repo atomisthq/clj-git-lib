@@ -7,7 +7,7 @@
             [clojure.data.json               :as json])
   (:import [java.io File]))
 
-(declare perform-write perform-mkdir perform-copy perform-git-add perform-git-commit perform-git-tag)
+(declare perform-write perform-mkdir perform-copy perform-git-add perform-git-commit perform-git-tag perform-edit perform-git-checkout)
 
 (def ^:dynamic repo nil)
 
@@ -22,7 +22,7 @@
   `(if (and (.exists ~f) (contains-repo ~f))
      (with-bindings {#'repo ~f}
        (act-on-filesystem [~@instructions]))
-     (throw (ex-info {:error (str ~f "is not a valid git repository")}))))
+     (throw (ex-info "Not a valid git repository" {:error (str ~f "is not a valid git repository")}))))
 
 (s/defn act-on-filesystem [instructions :- [t/Instruction]]
   (let [errors (remove nil? (map :error instructions))]
