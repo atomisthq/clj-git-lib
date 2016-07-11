@@ -1,32 +1,41 @@
 # clj-git-lib
 
-Clojure library designed to automate some git operations against the local filesystem (using jgit)
+Clojure library designed to automate some git operations against a local filesystem (using jgit)
 
 ## Usage
 
-There is really jut one function called `perform`:
+There is really just one function called `perform`:
 
 ```clj
 
-(defn json-editor [new-image data] 
-  (update-in [:spec :template :containers 0 :image] (constantly new-image)))
+(defn json-editor 
+  "create an editor so update the conatiner image in a k8 spec"
+  [new-image-name data] 
+  (update-in [:spec :template :containers 0 :image] (constantly new-image-name)))
 
+;; now execute the full set of 
 (perform (File. "git-repo-root")
-  {:edit       {:file-pattern "whatever.json" :editor (partial json-editor "new-image")}}
-  {:git-add    {:file-pattern "whatever.json"}}
-  {:git-commit {:message "here's a new commit message"}}
-  {:git-push   {:remote "origin" :branch "master"}})
+  {:git-checkout {:branch "prod"}}
+  {:edit         {:file-pattern "80-bot-deployment.json" :editor (partial json-editor "new-image")}}
+  {:git-add      {:file-pattern "80-bot-deployment.json"}}
+  {:git-commit   {:message "here's a new commit message"}}
+  {:git-push     {:remote "origin" :branch "prod"}})
 ```
 
 The first parameter to `perform` should be the location of the git repo that 
  you're working on.  The remaining args are the set of instructions that you
- want to perform in the repo.
+ want to perform within this repo.
  
-It could be convenient to define editors which take the current data and return
-the new data.  If file name patterns end with known file types, the data passed
-in and out of the editors will be clojure data structures from things like
-json, or yaml parsers.  Otherwise, the data will just be `String`s.
-
 Today, we just support local jgit instructions, but if we change the first parameter 
 to be remote repos, we could support the atomist git service and the tentacles github
-api with the same function, and the same "instruction" set.
+api with the same function, and the same "instruction" set.  The key idea would be to to define
+data to represent these "instructions" independently of whether it's a local git repo, or a remote one.
+
+The current schemas are [here](https://github.com/atomisthq/clj-git-lib/blob/master/src/atomist/git/schemas.clj).
+
+Hopefully, they're pretty self-explanatory.  I plan to change the perform operation to do a two-pass things where it first validates all of the input and only then runs the instructions, but the first commit doesn't have that.
+
+### Editors
+
+I also want to have very simple editors that take the current file data as input and return the new file data.  For file types, we don't recognize, the data would just be a String, but the file contains `json` or `yaml`, we can pass in editable clojure data structures.  See the `edit` multimethods [at the bottom of core.clj](https://github.com/atomisthq/clj-git-lib/blob/master/src/atomist/git/core.clj#L109)
+
