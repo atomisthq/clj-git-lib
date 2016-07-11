@@ -1,4 +1,6 @@
 /target
+test-repo/
+.idea/
 /classes
 /checkouts
 pom.xml

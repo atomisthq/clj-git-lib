@@ -10,6 +10,7 @@
 (s/defschema GitCommit        {:git-commit   {:message      s/Str}})
 (s/defschema GitTag           {:git-tag      {:message      s/Str}})
 (s/defschema GitPush          {:git-push     {:remote s/Str :branch s/Str}})
+(s/defschema GitClone         {:git-clone    {:org s/Str :repo s/Str :oauth-token s/Str :to s/Str}})
 (s/defschema ErrorInstruction {:error s/Str})
 (s/defschema NoOp {:noop s/Any})
 (s/defschema Instruction (s/named (s/either WriteInstruction CopyInstruction MkdirInstruction EditInstruction ErrorInstruction GitAdd GitCommit GitTag GitPush GitCheckout NoOp) "Instruction"))

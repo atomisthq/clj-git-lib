@@ -1,5 +1,5 @@
-(defproject clj-git-lib "0.1.0"
-  :description "FIXME: write description"
+(defproject com.atomist/clj-git-lib "0.1.0"
+  :description "Small wrapper around jgit with some handy editing utilities"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -12,8 +12,7 @@
                  [org.slf4j/jul-to-slf4j "1.7.21"]
                  [org.slf4j/log4j-over-slf4j "1.7.21"]
                  [org.slf4j/slf4j-api "1.7.21"]
-                 [org.clojure/data.json        "0.2.6"]
-                 ]
+                 [org.clojure/data.json        "0.2.6"]]
   :exclusions [commons-logging log4j org.slf4j/slf4j-log4j12]
 
   :repositories [
@@ -26,6 +25,4 @@
                               :password [:gpg :env/artifactory_pwd]}]
                  ["plugins" {:url      "https://sforzando.artifactoryonline.com/sforzando/plugins-release"
                              :username [:gpg :env/artifactory_user]
-                             :password [:gpg :env/artifactory_pwd]}]
-                 ]
-  )
+                             :password [:gpg :env/artifactory_pwd]}]])
