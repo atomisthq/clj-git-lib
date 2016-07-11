@@ -3,13 +3,12 @@ env:
   global:
   - COMMIT: ${TRAVIS_COMMIT::7}
   - ARTIFACTORY_USER: travis-mvn-deploy
-  - secure: ZwzYa41B2lP2TyjdbmnQZNuGQ2uFypsW7BZwOT33qi7o7zvviiistRhhK4GiRqg8++oC6xdkFl1gXb6kMc+qEsqtRDg3hJV2g7pBqpHlNbqSLTQHJkRP/c0oVsRI1LfjRd9fAPvlonr/kMYPesr4UVaHrP7XA6hF/WYvg3c5+wR2InUEXCGwN+0b4CR/yRi+khPeen/tQe3XmZw2xyx7MlWC+QwtirRsoEgX8HIBsqN8MLfSDZSouIavikid+sdG+Rwha4aThoATSF6QgM2x0ACgnEOOntrAD1QZrerZbUwL5PPe1AP1X4lwO74zHOYsLGYzMzRa5cib16FWjcjc04jZEyloTgtUvRc0zoju5VY4ed+5YhNDJrMnfzMGGar21tb4min6ca3IDQYUH/kWLamvC6swKKPIoSb8lBk9Mr27+a9M9KFP1Qe1CwMt5RuDWouHxJw+Z41v1zcJEd/OYIFbyuuM7KqEAG9NhnCS4Sa6RdlvfCovExF815iLhhwhyyOzdz22shvTFAU8ms4POMZ6accqPoDwotrEhE+3yU6V2gZBtdDxQs2EHBafxPJd2iPQdML9IEOfyyjdtJ5SYw2zanjzU0Qg6lmVqrOlX7YzRA88taLYq/PxR4nHvuZPR/RGzOkwH2mUVHGYCpuHsdD5C3nJHsDuM8xRzPFE1vI=
-install: sudo rm -rf ~/.lein; mkdir lein; wget -O lein/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein;
-  chmod a+x lein/lein; lein/lein version; export PATH=$PATH:./lein/
+  - secure: OSBROmAeiRK6kJyuFtc+13JavrBY+xfGR9jxBrB78KT7OWJ5Bj9L3BHdS/ljGfkSvrrZV+KUYKG6BLrGUyQBgcevSB0IelpQjE2V2YtL2aTamzLA/8Urb4cqJYP2nMpAQL7oCEhlVvn5gJcmZL/Ej/m0YRUhaiZ2p+YVlE7CSNXW61BsYd5tgYoQd/owjWGMainbbQtu96pcqhwEPDs5elw5C6/Oe2N3ya/C4WGUYv+yt2vPVQWaMfTP5WPtBzsjJ8kVPdFZFgsAAwfHWLd/GrVaTap1PLLzvh3sP3x4TZtOpGJKq3Kw/HS+7IbsV7QW/p+Ogp9JvsTgQu7ZYvjffOt6SCH/efpJoOyJgp3yeD+mcG6vOjEpH5ZOFAWqKUzYlklDVBJlir2l/YzP2OUT0fNwTNXmlCnTEBsiP6S8ex5Jx0I07W6LrxDcPYjrBzXahTirZ4rsYb0jvurDVEy/2gI7BzAINTqDHWmZG02Ys5sGlXH2gYq8sDhV7KYG/1nMCBPPYTWz1Q6LvOHhSo/jG8v5vkmI4zIh+lxYzNMLZ884SiKRzp647c6DmxH4U6fq9KsgtUdChriYc0xZa+gJbZ9wvigdERC9rul1OkkG28dACjCs2FWZNe6AUCaV+uIh0Vi2gKPTkcY73RLBfM7/mASyjKb6y8Jgei55sanBBTQ=
 script: ./travis-build-deploy.sh
 branches:
   only:
   - master
+  - develop
 jdk:
 - oraclejdk8
 notifications:
