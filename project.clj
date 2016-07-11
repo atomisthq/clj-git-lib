@@ -17,12 +17,12 @@
 
   :repositories [
                  ["releases" {:url      "https://sforzando.artifactoryonline.com/sforzando/libs-release-local"
-                              :username [:gpg :env/artifactory_user]
+                              :username [:env/artifactory_user]
                               :sign-releases false
-                              :password [:gpg :env/artifactory_pwd]}]
+                              :password [ :env/artifactory_pwd]}]
                  ["plugins" {:url      "https://sforzando.artifactoryonline.com/sforzando/plugins-release"
-                             :username [:gpg :env/artifactory_user]
-                             :password [:gpg :env/artifactory_pwd]}]]
+                             :username [:env/artifactory_user]
+                             :password [:env/artifactory_pwd]}]]
   :profiles {:dev
              {:source-paths ["dev"]
               :plugins      [[jonase/eastwood "0.2.1"]

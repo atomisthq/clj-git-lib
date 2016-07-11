@@ -10,10 +10,11 @@ export PV=$(head -n 1 project.clj | cut -d ' ' -f3 | cut -d '"' -f2 | cut -d '-'
 echo "Version is: $PV"
 
 lein set-version $PV :no-snapshot true || die "Error setting version"
-lein do clean, test, jar, deploy || die "Error building/deploying jar"
+lein do clean, test, jar || die "Error building/deploying jar"
 echo "Branch is ${TRAVIS_BRANCH}"
 
 if [ "${TRAVIS_BRANCH}" == "master" ]; then
+  lein deploy || die "Error deploying"
   git config --global user.email "travis-ci@atomist.com"
   git config --global user.name "Travis CI"
   git tag $PV -m "Generated tag from TravisCI build $TRAVIS_BUILD_NUMBER"
