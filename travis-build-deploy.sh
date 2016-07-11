@@ -6,7 +6,6 @@ die(){
 }
 
 sudo rm -rf ~/.lein
-mkdir lein
 wget -O lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
 chmod a+x lein
 lein version
