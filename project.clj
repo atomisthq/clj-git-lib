@@ -1,4 +1,4 @@
-(defproject com.atomist/clj-git-lib "0.1.0"
+(defproject com.atomist/clj-git-lib "0.1.1-SNAPSHOT"
   :description "Small wrapper around jgit with some handy editing utilities"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -16,13 +16,18 @@
   :exclusions [commons-logging log4j org.slf4j/slf4j-log4j12]
 
   :repositories [
-                 ["snapshots" {:url      "https://sforzando.artifactoryonline.com/sforzando/libs-snapshot-local"
-                               :username [:gpg :env/artifactory_user]
-                               :password [:gpg :env/artifactory_pwd]
-                               :snapshots true}]
                  ["releases" {:url      "https://sforzando.artifactoryonline.com/sforzando/libs-release-local"
                               :username [:gpg :env/artifactory_user]
+                              :sign-releases false
                               :password [:gpg :env/artifactory_pwd]}]
                  ["plugins" {:url      "https://sforzando.artifactoryonline.com/sforzando/plugins-release"
                              :username [:gpg :env/artifactory_user]
-                             :password [:gpg :env/artifactory_pwd]}]])
+                             :password [:gpg :env/artifactory_pwd]}]]
+  :profiles {:dev
+             {:source-paths ["dev"]
+              :plugins      [[jonase/eastwood "0.2.1"]
+                             [lein-cloverage "1.0.6"]
+                             [lein-set-version "0.4.1"]
+                             [lein-ancient "0.6.8" :exclusions [org.clojure/clojure]]]
+              :eastwood     {:namespaces      [:source-paths]
+                             :exclude-linters []}}})

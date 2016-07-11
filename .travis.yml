@@ -1,0 +1,20 @@
+language: clojure
+env:
+  global:
+  - COMMIT: ${TRAVIS_COMMIT::7}
+  - ARTIFACTORY_USER: travis-mvn-deploy
+  - secure: ZwzYa41B2lP2TyjdbmnQZNuGQ2uFypsW7BZwOT33qi7o7zvviiistRhhK4GiRqg8++oC6xdkFl1gXb6kMc+qEsqtRDg3hJV2g7pBqpHlNbqSLTQHJkRP/c0oVsRI1LfjRd9fAPvlonr/kMYPesr4UVaHrP7XA6hF/WYvg3c5+wR2InUEXCGwN+0b4CR/yRi+khPeen/tQe3XmZw2xyx7MlWC+QwtirRsoEgX8HIBsqN8MLfSDZSouIavikid+sdG+Rwha4aThoATSF6QgM2x0ACgnEOOntrAD1QZrerZbUwL5PPe1AP1X4lwO74zHOYsLGYzMzRa5cib16FWjcjc04jZEyloTgtUvRc0zoju5VY4ed+5YhNDJrMnfzMGGar21tb4min6ca3IDQYUH/kWLamvC6swKKPIoSb8lBk9Mr27+a9M9KFP1Qe1CwMt5RuDWouHxJw+Z41v1zcJEd/OYIFbyuuM7KqEAG9NhnCS4Sa6RdlvfCovExF815iLhhwhyyOzdz22shvTFAU8ms4POMZ6accqPoDwotrEhE+3yU6V2gZBtdDxQs2EHBafxPJd2iPQdML9IEOfyyjdtJ5SYw2zanjzU0Qg6lmVqrOlX7YzRA88taLYq/PxR4nHvuZPR/RGzOkwH2mUVHGYCpuHsdD5C3nJHsDuM8xRzPFE1vI=
+install: sudo rm -rf ~/.lein; mkdir lein; wget -O lein/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein;
+  chmod a+x lein/lein; lein/lein version; export PATH=$PATH:./lein/
+script: ./travis-build-deploy.sh
+branches:
+  only:
+  - master
+jdk:
+- oraclejdk8
+notifications:
+  slack: atomist:djCbqLfRUUwivr2pXqtByTn9
+  email: false
+cache:
+  directories:
+  - $HOME/.m2
