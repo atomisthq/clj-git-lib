@@ -14,7 +14,7 @@ There is really just one function called `perform`:
   (update-in [:spec :template :containers 0 :image] (constantly new-image-name)))
 
 ;; now execute the full set of 
-(perform (File. "git-repo-root")
+(perform (File. "/Users/slim/repo/atomist-k8-specs")
   {:git-checkout {:branch "prod"}}
   {:edit         {:file-pattern "80-bot-deployment.json" :editor (partial json-editor "new-image")}}
   {:git-add      {:file-pattern "80-bot-deployment.json"}}
