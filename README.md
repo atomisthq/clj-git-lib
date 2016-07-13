@@ -27,11 +27,11 @@ There is really just one function called `perform`:
 
 ;; now execute the full set of 
 (perform (File. "/Users/slim/repo/atomist-k8-specs")
-  {:git-checkout {:branch "prod"}}
-  {:edit         {:file-pattern "80-bot-deployment.json" :editor (partial json-editor "new-image")}}
-  {:git-add      {:file-pattern "80-bot-deployment.json"}}
-  {:git-commit   {:message "here's a new commit message"}}
-  {:git-push     {:remote "origin" :branch "prod"}})
+  :git-checkout {:branch "prod"}
+  :edit         {:file-pattern "80-bot-deployment.json" :editor (partial json-editor "new-image")}
+  :git-add      {:file-pattern "80-bot-deployment.json"}
+  :git-commit   {:message "here's a new commit message"}
+  :git-push     {:remote "origin" :branch "prod"})
 ```
 
 The first parameter to `perform` should be the location of the git repo that 
