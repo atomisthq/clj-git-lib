@@ -61,9 +61,13 @@
 
 (defmethod perform-instruction :git-tag
   [{params :params :as instr}]
-  (let [{tag-message :message} params]
-    (jgit/with-repo (:repo instr)
-      (jgit/git-tag repo tag-message))))
+  (let [{tag-message :message tag-name :name} params]
+    (->
+      (Git. (FileRepository. (File. (:repo instr) "/.git")))
+      (.tag)
+      (.setName tag-name)
+      (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+      (.call))))
 
 (defmethod perform-instruction :git-push
   [instr]
