@@ -1,11 +1,12 @@
 (ns com.atomist.git.core
   (:require [clj-jgit.porcelain              :as jgit]
-            [schema.core                     :as s]
             [clojure.pprint                  :refer :all]
-            [com.atomist.git.schemas             :as t]
             [clojure.java.io                 :as io]
             [clojure.data.json               :as json])
-  (:import [java.io File]))
+  (:import [java.io File]
+           (org.eclipse.jgit.api Git)
+           (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider)
+           (org.eclipse.jgit.internal.storage.file FileRepository)))
 
 (defn contains-repo [f]
   (let [dot-git (File. f ".git")]
@@ -13,8 +14,8 @@
 
 (defmulti perform-instruction
   "Do something to a git repo"
-  (fn [type _]
-    type))
+  (fn [instr]
+    (:command instr)))
 
 (defmulti edit (fn [_ file-pattern _]
                  (cond
@@ -27,53 +28,84 @@
                    :slurp)))
 
 (defmethod perform-instruction :edit
-  [_ instr]
-  (let [{:keys [file-pattern editor]} instr]
+  [{params :params :as instr}]
+  (let [{:keys [file-pattern editor]} params]
     (edit (:repo instr) file-pattern editor)))
 
 (defmethod perform-instruction :write
-  [_ instr]
-  (let [{destination :to, contents :contents} instr]
+  [{params :params :as instr}]
+  (let [{destination :to, contents :contents} params]
     (spit destination contents)))
 
 (defmethod perform-instruction :mkdir
-  [_ instr]
-  (let [{file-that-needs-a-home :for} instr]
+  [{params :params :as instr}]
+  (let [{file-that-needs-a-home :for} params]
     (io/make-parents (File. (:repo instr) file-that-needs-a-home))))
 
 (defmethod perform-instruction :copy
-  [_ instr]
-  (let [{from-file :from to-file :to} instr]
+  [{params :params :as instr}]
+  (let [{from-file :from to-file :to} params]
     (io/copy (File. (:repo instr) from-file) (File. (:repo instr) to-file))))
 
 (defmethod perform-instruction :git-checkout
-  [_ instr]
-  (let [{:keys [branch]} instr]
+  [{params :params :as instr}]
+  (let [{:keys [branch]} params]
     (jgit/with-repo (:repo instr)
-      (jgit/git-checkout branch))))
+      (jgit/git-checkout repo branch))))
 
 (defmethod perform-instruction :git-commit
-  [_ instr]
-  (let [{commit-message :message} instr]
-    (jgit/with-repo (:repo instr) (jgit/git-commit repo commit-message))))
+  [{params :params :as instr}]
+  (let [{commit-message :message} params]
+    (jgit/with-repo (:repo instr)
+      (jgit/git-commit repo commit-message))))
 
 (defmethod perform-instruction :git-tag
-  [_ instr]
-  (let [{tag-message :message} instr]
-    (jgit/with-repo (:repo instr) (jgit/git-tag repo tag-message))))
+  [{params :params :as instr}]
+  (let [{tag-message :message} params]
+    (jgit/with-repo (:repo instr)
+      (jgit/git-tag repo tag-message))))
 
 (defmethod perform-instruction :git-push
-  [_ instr]
-  (let [{:keys [remote branch]} instr]
-    (jgit/with-repo (:repo instr) (jgit/git-push))))
+  [instr]
+  (jgit/with-repo (:repo instr) (jgit/git-push)))
+
+(defn delete-recursively [fname]
+  (let [func (fn [func f]
+               (when (.isDirectory f)
+                 (doseq [f2 (.listFiles f)]
+                   (func func f2)))
+               (clojure.java.io/delete-file f))]
+    (func func (clojure.java.io/file fname))))
 
 (defmethod perform-instruction :git-clone
-  [_ instr]
-  (jgit/git-clone (str "https://" (:oauth-token instr) "@github.com/" (:org instr) "/" (:repo instr) ".git") (File. (:to instr))))
+  [{params :params :as instr}]
+  (let [clone #(doto
+                (Git/cloneRepository)
+                (.setDirectory (:repo instr))
+                (.setURI (str "https://github.com/" (:org params) "/" (:repo-name params) ".git"))
+                (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+                (.call))]
+    (if (not (.exists (:repo instr)))
+      (clone)
+      (if (:try-fetch? params)
+        (try
+          (->
+            (Git. (FileRepository. (File. (:repo instr) "/.git")))
+            (.pull)
+            (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+            (.setRebase true)
+            (.call))
+          (catch Exception e
+            (if (:force? params)
+              (do
+                (delete-recursively (:repo instr))
+                (clone))
+              (throw e))))
+        (throw (RuntimeException. "Target directory already exists, and try-fetch? is not set"))))))
 
 (defmethod perform-instruction :git-add
-  [_ instr]
-  (let [{file-that-needs-adding :file-pattern} instr]
+  [{params :params :as instr}]
+  (let [{file-that-needs-adding :file-pattern} params]
     (jgit/with-repo (:repo instr)
       (jgit/git-add repo file-that-needs-adding))))
 
@@ -81,14 +113,11 @@
   [^java.io.File repo instructions]
   (let [errors (remove nil? (map :error instructions))]
     (cond
-      (seq errors)
-      (do (println "Errors:" errors)
-          (throw (ex-info "Errors occurred" {:errors errors :instructions instructions})))
+      (seq errors) (throw (ex-info "Errors occurred" {:errors errors :instructions instructions}))
       :else
       (loop [instructions instructions]
         (when (not-empty instructions)
-          (println ".... perform " (take 2 instructions))
-          (perform-instruction (first instructions) (assoc (second instructions) :repo repo))
+          (perform-instruction {:command (first instructions) :params (second instructions) :repo repo})
           (recur (nthrest instructions 2)))))))
 
 (defn perform
