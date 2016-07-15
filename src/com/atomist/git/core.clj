@@ -86,6 +86,7 @@
   (let [clone #(doto
                 (Git/cloneRepository)
                 (.setDirectory (:repo instr))
+                (.setBranch (:branch params))
                 (.setURI (str "https://github.com/" (:org params) "/" (:repo-name params) ".git"))
                 (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
                 (.call))]
