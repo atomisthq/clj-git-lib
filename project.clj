@@ -1,13 +1,13 @@
-(defproject com.atomist/clj-git-lib "0.1.1-SNAPSHOT"
+(defproject com.atomist/clj-git-lib "0.1.2-SNAPSHOT"
   :description "Small wrapper around jgit with some handy editing utilities"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure               "1.8.0"]
-                 [clj-jgit                          "0.8.8"]
-                 [prismatic/schema                  "0.3.7"]
+                 [clj-jgit                          "0.8.9"]
+                 [prismatic/schema "1.1.2"]
                  [org.clojure/tools.logging       "0.3.1"]
-                 [ch.qos.logback/logback-classic "1.0.13"]
+                 [ch.qos.logback/logback-classic "1.1.7"]
                  [org.slf4j/jcl-over-slf4j "1.7.21"]
                  [org.slf4j/jul-to-slf4j "1.7.21"]
                  [org.slf4j/log4j-over-slf4j "1.7.21"]
