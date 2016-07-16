@@ -139,9 +139,9 @@
 (defmethod edit :json
   [repo file-pattern editor]
   (->> (slurp (File. repo file-pattern))
-       (json/read-json)
+       (json/read-str :key-fn keyword)
        (editor)
-       (json/json-str)
+       (json/pprint)
        (spit (File. repo file-pattern))))
 
 (defmethod edit :slurp
