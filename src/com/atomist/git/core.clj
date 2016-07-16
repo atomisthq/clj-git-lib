@@ -1,8 +1,8 @@
 (ns com.atomist.git.core
-  (:require [clj-jgit.porcelain              :as jgit]
-            [clojure.pprint                  :refer :all]
-            [clojure.java.io                 :as io]
-            [clojure.data.json               :as json])
+  (:require [clj-jgit.porcelain :as jgit]
+            [clojure.pprint :refer :all]
+            [clojure.java.io :as io]
+            [clojure.data.json :as json])
   (:import [java.io File]
            (org.eclipse.jgit.api Git)
            (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider)
@@ -70,8 +70,13 @@
       (.call))))
 
 (defmethod perform-instruction :git-push
-  [instr]
-  (jgit/with-repo (:repo instr) (jgit/git-push)))
+  [{params :params :as instr}]
+  (->
+    (Git. (FileRepository. (File. (:repo instr) "/.git")))
+    (.push)
+    (.setRemote (:remote params))
+    (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+    (.call)))
 
 (defn delete-recursively [fname]
   (let [func (fn [func f]
@@ -139,15 +144,15 @@
 (defmethod edit :json
   [repo file-pattern editor]
   (->> (slurp (File. repo file-pattern))
-       (json/read-str :key-fn keyword)
-       (editor)
-       (json/pprint)
-       (spit (File. repo file-pattern))))
+    (json/read-str :key-fn keyword)
+    (editor)
+    (json/pprint)
+    (spit (File. repo file-pattern))))
 
 (defmethod edit :slurp
   [repo file-pattern editor]
   (->> (slurp (File. repo file-pattern))
-      (editor)
-      (spit (File. repo file-pattern))))
+    (editor)
+    (spit (File. repo file-pattern))))
 
 
