@@ -1,8 +1,10 @@
 (ns com.atomist.git.core
   (:require [clj-jgit.porcelain :as jgit]
             [clojure.pprint :refer :all]
+            [cheshire.core :as cheshire]
             [clojure.java.io :as io]
-            [clojure.data.json :as json])
+            [clojure.data.json :as json]
+            )
   (:import [java.io File]
            (org.eclipse.jgit.api Git)
            (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider)
@@ -146,7 +148,7 @@
   (->>
     (json/read-str (slurp (File. repo file-pattern)) :key-fn keyword)
     (editor)
-    (json/pprint)
+    (cheshire/generate-string)
     (spit (File. repo file-pattern))))
 
 (defmethod edit :slurp
