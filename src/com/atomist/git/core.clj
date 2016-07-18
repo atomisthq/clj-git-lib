@@ -145,11 +145,13 @@
 
 (defmethod edit :json
   [repo file-pattern editor]
-  (->>
-    (json/read-str (slurp (File. repo file-pattern)) :key-fn keyword)
-    (editor)
-    (cheshire/generate-string)
-    (spit (File. repo file-pattern))))
+  (let [thefile (File. repo file-pattern)]
+    (as->
+      (slurp thefile) spec
+      (json/read-str spec :key-fn keyword)
+      (editor spec)
+      (cheshire/generate-string spec {:pretty true})
+      (spit thefile spec))))
 
 (defmethod edit :slurp
   [repo file-pattern editor]
