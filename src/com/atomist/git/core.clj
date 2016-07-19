@@ -7,7 +7,7 @@
             )
   (:import [java.io File]
            (org.eclipse.jgit.api Git)
-           (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider)
+           (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider RefSpec)
            (org.eclipse.jgit.internal.storage.file FileRepository)))
 
 (defn contains-repo [f]
@@ -64,21 +64,36 @@
 (defmethod perform-instruction :git-tag
   [{params :params :as instr}]
   (let [{tag-message :message tag-name :name} params]
-    (->
-      (Git. (FileRepository. (File. (:repo instr) "/.git")))
-      (.tag)
-      (.setName tag-name)
-      (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
-      (.call))))
+    (if (:oauth-token params)
+      (->
+        (Git. (FileRepository. (File. (:repo instr) "/.git")))
+        (.tag)
+        (.setName tag-name)
+        (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+        (.call))
+      (->
+        (Git. (FileRepository. (File. (:repo instr) "/.git")))
+        (.tag)
+        (.setName tag-name)
+        (.setMessage tag-message)
+        (.call)))))
 
 (defmethod perform-instruction :git-push
   [{params :params :as instr}]
-  (->
-    (Git. (FileRepository. (File. (:repo instr) "/.git")))
-    (.push)
-    (.setRemote (:remote params))
-    (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
-    (.call)))
+  (if (:oauth-token params)
+    (->
+      (Git. (FileRepository. (File. (:repo instr) "/.git")))
+      (.push)
+      (.setRemote (:remote params))
+      (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+      (.call))
+    (->
+      (Git. (FileRepository. (File. (:repo instr) "/.git")))
+      (.push)
+      (.setPushTags)
+      (.setRemote (:remote params))
+      (.setRefSpecs [(RefSpec. (:spec params))])
+      (.call))))
 
 (defn delete-recursively [fname]
   (let [func (fn [func f]
