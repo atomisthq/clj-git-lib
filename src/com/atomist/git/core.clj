@@ -57,10 +57,10 @@
 
 (defmethod perform-instruction :git-commit
   [{params :params :as instr}]
-  (let [{commit-message :message user :user email :email} params]
+  (let [{commit-message :message name :name email :email} params]
     (jgit/with-repo (:repo instr)
-      (if (and user email) 
-        (jgit/git-commit repo commit-message {user email})
+      (if (and name email)
+        (jgit/git-commit repo commit-message {:name name :email email})
         (jgit/git-commit repo commit-message)))))
 
 (defmethod perform-instruction :git-tag

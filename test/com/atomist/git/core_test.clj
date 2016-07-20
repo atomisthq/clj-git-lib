@@ -15,7 +15,7 @@
       (perform f
          :edit {:file-pattern "whatever.json" :editor editor}
          :git-add {:file-pattern "whatever.json"}
-         :git-commit {:message ""}))))
+         :git-commit {:message "" :name "test" :email "test@test.com"}))))
 
 ;(fresh-repo-add-and-commit)
 
