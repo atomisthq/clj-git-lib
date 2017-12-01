@@ -63,6 +63,13 @@
         (jgit/git-commit repo commit-message {:name name :email email})
         (jgit/git-commit repo commit-message)))))
 
+(defmethod perform-instruction :git-branch-create
+  [{params :params :as instr}]
+  (let [{:keys [branch]} params]
+    (jgit/with-repo (:repo instr)
+                    (if branch
+                      (jgit/git-branch-create repo branch)))))
+
 (defmethod perform-instruction :git-tag
   [{params :params :as instr}]
   (let [{tag-message :message tag-name :name} params]
