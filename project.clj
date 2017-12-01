@@ -16,6 +16,18 @@
                  [org.clojure/data.json        "0.2.6"]]
   :exclusions [commons-logging log4j org.slf4j/slf4j-log4j12]
 
+  :vcs :git
+
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version"
+                   "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "--no-sign"]
+                  ["deploy" "releases"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]]
+
   :repositories [
                  ["releases" {:url      "https://sforzando.artifactoryonline.com/sforzando/libs-release-local"
                               :username [:env/artifactory_user]
