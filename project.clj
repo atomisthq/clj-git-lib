@@ -1,4 +1,4 @@
-(defproject com.atomist/clj-git-lib "0.2.11-SNAPSHOT"
+(defproject com.atomist/clj-git-lib "0.3.0-SNAPSHOT"
   :description "Small wrapper around jgit with some handy editing utilities"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -28,14 +28,10 @@
                   ["vcs" "commit"]
                   ["vcs" "push"]]
 
-  :repositories [
-                 ["releases" {:url      "https://sforzando.artifactoryonline.com/sforzando/libs-release-local"
-                              :username [:env/artifactory_user]
+  :repositories [["releases" {:url      "https://atomist.jfrog.io/atomist/libs-release-local"
                               :sign-releases false
-                              :password [ :env/artifactory_pwd]}]
-                 ["plugins" {:url      "https://sforzando.artifactoryonline.com/sforzando/plugins-release"
-                             :username [:env/artifactory_user]
-                             :password [:env/artifactory_pwd]}]]
+                              :username [:env/artifactory_user]
+                              :password [ :env/artifactory_pwd]}]]
   :profiles {:dev
              {:source-paths ["dev"]
               :plugins      [[jonase/eastwood "0.2.1"]
