@@ -9,7 +9,7 @@ Clojure library designed to automate some git operations against a local filesys
 The leiningen dependency is:
 
 ```
-[clj-git-lib "0.1.1"]
+[clj-git-lib "0.3.0"]
 ```
 
 ```
