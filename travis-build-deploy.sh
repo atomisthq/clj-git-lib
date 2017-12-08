@@ -15,12 +15,3 @@ echo "Version is: $PV"
 
 ./lein set-version $PV :no-snapshot true || die "Error setting version"
 ./lein do clean, test, jar || die "Error building/deploying jar"
-echo "Branch is ${TRAVIS_BRANCH}"
-
-if [ "${TRAVIS_BRANCH}" == "master" ] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
-  ./lein deploy || die "Error deploying"
-  git config --global user.email "travis-ci@atomist.com"
-  git config --global user.name "Travis CI"
-  git tag $PV -m "Generated tag from TravisCI build $TRAVIS_BUILD_NUMBER"
-  git push origin $PV --follow-tags
-fi
