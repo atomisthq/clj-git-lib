@@ -31,7 +31,7 @@
   :repositories [["releases" {:url      "https://atomist.jfrog.io/atomist/libs-release-local"
                               :sign-releases false
                               :username [:env/artifactory_user]
-                              :password [ :env/artifactory_pwd]}]]
+                              :password [:env/artifactory_pwd]}]]
   :profiles {:dev
              {:source-paths ["dev"]
               :plugins      [[jonase/eastwood "0.2.1"]
