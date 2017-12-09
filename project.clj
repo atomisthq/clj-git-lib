@@ -1,6 +1,6 @@
-(defproject com.atomist/clj-git-lib "0.3.1-SNAPSHOT"
+(defproject com.atomist/clj-git-lib "0.3.0"
   :description "Small wrapper around jgit with some handy editing utilities"
-  :url "http://example.com/FIXME"
+  :url "https://github.com/atomisthq/clj-git-lib"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure               "1.8.0"]
@@ -23,7 +23,7 @@
                    "leiningen.release/bump-version" "release"]
                   ["vcs" "commit"]
                   ["vcs" "tag" "--no-sign"]
-                  ["deploy" "releases"]
+                  ["deploy" "clojars"]
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit"]
                   ["vcs" "push"]]

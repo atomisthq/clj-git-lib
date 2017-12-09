@@ -8,9 +8,7 @@ Clojure library designed to automate some git operations against a local filesys
 
 The leiningen dependency is:
 
-```
-[clj-git-lib "0.3.0"]
-```
+[![Clojars Project](https://img.shields.io/clojars/v/com.atomist/clj-git-lib.svg)](https://clojars.org/com.atomist/clj-git-lib)
 
 ```
 (:require [atomist.git :refer [perform]]
