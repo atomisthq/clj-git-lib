@@ -13,9 +13,9 @@
       (jgit/git-init f)
       (spit (File. f "whatever.json") (json/write-str {:key1 "val1" :key2 "val2"}))
       (perform f
-         :edit {:file-pattern "whatever.json" :editor editor}
-         :git-add {:file-pattern "whatever.json"}
-         :git-commit {:message "" :name "test" :email "test@test.com"}))))
+               :edit {:file-pattern "whatever.json" :editor editor}
+               :git-add {:file-pattern "whatever.json"}
+               :git-commit {:message "" :name "test" :email "test@test.com"}))))
 
 ;(fresh-repo-add-and-commit)
 
