@@ -3,8 +3,7 @@
             [clojure.pprint :refer :all]
             [cheshire.core :as cheshire]
             [clojure.java.io :as io]
-            [clojure.data.json :as json]
-            )
+            [clojure.data.json :as json])
   (:import [java.io File]
            (org.eclipse.jgit.api Git)
            (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider RefSpec)
@@ -67,42 +66,42 @@
   [{params :params :as instr}]
   (let [{:keys [branch]} params]
     (jgit/with-repo (:repo instr)
-                    (if branch
-                      (jgit/git-branch-create repo branch)))))
+      (if branch
+        (jgit/git-branch-create repo branch)))))
 
 (defmethod perform-instruction :git-tag
   [{params :params :as instr}]
   (let [{tag-message :message tag-name :name} params]
     (if (:oauth-token params)
       (->
-        (Git. (FileRepository. (File. (:repo instr) "/.git")))
-        (.tag)
-        (.setName tag-name)
-        (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
-        (.call))
+       (Git. (FileRepository. (File. (:repo instr) "/.git")))
+       (.tag)
+       (.setName tag-name)
+       (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+       (.call))
       (->
-        (Git. (FileRepository. (File. (:repo instr) "/.git")))
-        (.tag)
-        (.setName tag-name)
-        (.setMessage tag-message)
-        (.call)))))
+       (Git. (FileRepository. (File. (:repo instr) "/.git")))
+       (.tag)
+       (.setName tag-name)
+       (.setMessage tag-message)
+       (.call)))))
 
 (defmethod perform-instruction :git-push
   [{params :params :as instr}]
   (if (:oauth-token params)
     (->
-      (Git. (FileRepository. (File. (:repo instr) "/.git")))
-      (.push)
-      (.setRemote (:remote params))
-      (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
-      (.call))
+     (Git. (FileRepository. (File. (:repo instr) "/.git")))
+     (.push)
+     (.setRemote (:remote params))
+     (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+     (.call))
     (->
-      (Git. (FileRepository. (File. (:repo instr) "/.git")))
-      (.push)
-      (.setPushTags)
-      (.setRemote (:remote params))
-      (.setRefSpecs [(RefSpec. (:spec params))])
-      (.call))))
+     (Git. (FileRepository. (File. (:repo instr) "/.git")))
+     (.push)
+     (.setPushTags)
+     (.setRemote (:remote params))
+     (.setRefSpecs [(RefSpec. (:spec params))])
+     (.call))))
 
 (defn delete-recursively [fname]
   (let [func (fn [func f]
@@ -116,21 +115,21 @@
   [{params :params :as instr}]
   (let [clone #(doto
                 (Git/cloneRepository)
-                (.setDirectory (:repo instr))
-                (.setBranch (:branch params))
-                (.setURI (str "https://github.com/" (:org params) "/" (:repo-name params) ".git"))
-                (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
-                (.call))]
+                 (.setDirectory (:repo instr))
+                 (.setBranch (:branch params))
+                 (.setURI (str "https://github.com/" (:org params) "/" (:repo-name params) ".git"))
+                 (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+                 (.call))]
     (if (not (.exists (:repo instr)))
       (clone)
       (if (:try-fetch? params)
         (try
           (->
-            (Git. (FileRepository. (File. (:repo instr) "/.git")))
-            (.pull)
-            (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
-            (.setRebase true)
-            (.call))
+           (Git. (FileRepository. (File. (:repo instr) "/.git")))
+           (.pull)
+           (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
+           (.setRebase true)
+           (.call))
           (catch Exception e
             (if (:force? params)
               (do
@@ -159,7 +158,7 @@
 (defn perform
   [^java.io.File repo & instructions]
   (if (or (= :git-clone (first instructions))
-        (and (.exists repo) (contains-repo repo)))
+          (and (.exists repo) (contains-repo repo)))
     (act-on-filesystem repo instructions)
     (throw (ex-info "Not a valid git repository" {:error (str repo "is not a valid git repository")}))))
 
@@ -171,7 +170,7 @@
   [repo file-pattern editor]
   (let [thefile (File. repo file-pattern)]
     (as->
-      (slurp thefile) spec
+     (slurp thefile) spec
       (json/read-str spec :key-fn keyword)
       (editor spec)
       (cheshire/generate-string spec {:pretty true})
@@ -180,7 +179,6 @@
 (defmethod edit :slurp
   [repo file-pattern editor]
   (->> (slurp (File. repo file-pattern))
-    (editor)
-    (spit (File. repo file-pattern))))
-
+       (editor)
+       (spit (File. repo file-pattern))))
 
