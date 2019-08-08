@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure               "1.8.0"]
                  [clj-jgit                          "0.8.9"]
-                 [prismatic/schema "1.1.2"]
+                 [prismatic/schema "1.1.11"]
                  [org.clojure/tools.logging       "0.3.1"]
                  [ch.qos.logback/logback-classic "1.1.7"]
                  [cheshire "5.6.3"]                         ;for pretty print output to file
