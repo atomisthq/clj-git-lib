@@ -33,6 +33,11 @@
   (let [{:keys [file-pattern editor]} params]
     (edit (:repo instr) file-pattern editor)))
 
+(defmethod perform-instruction :editor
+  [{params :params :as instr}]
+  (let [{:keys [editor]} params]
+    (editor (:repo instr))))
+
 (defmethod perform-instruction :write
   [{params :params :as instr}]
   (let [{destination :to, contents :contents} params]
