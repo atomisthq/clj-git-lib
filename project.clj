@@ -18,7 +18,7 @@
 
   :vcs :git
 
-  :release-tasks [["vcs" "assert-committed"]
+  :release-tasks [#_["vcs" "assert-committed"]
                   ["change" "version"
                    "leiningen.release/bump-version" "release"]
                   ["vcs" "commit"]
