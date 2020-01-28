@@ -1,7 +1,5 @@
 # clj-git-lib
 
-[![Build Status](https://travis-ci.com/atomisthq/clj-git-lib.svg?token=iZrpQxJakudjNfb3zxAZ&branch=master)](https://travis-ci.com/atomisthq/clj-git-lib)
-
 Clojure library designed to automate some git operations against a local filesystem (using jgit)
 
 ## Usage
