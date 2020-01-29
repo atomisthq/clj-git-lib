@@ -155,9 +155,8 @@
     (jgit/with-repo (:repo instr)
       (jgit/git-rm repo file-that-needs-deleting))))
 
-
 (defn act-on-filesystem
-  [^java.io.File repo instructions]
+  [^File repo instructions]
   (let [errors (remove nil? (map :error instructions))]
     (cond
       (seq errors) (throw (ex-info "Errors occurred" {:errors errors :instructions instructions}))
@@ -168,7 +167,7 @@
           (recur (nthrest instructions 2)))))))
 
 (defn perform
-  [^java.io.File repo & instructions]
+  [^File repo & instructions]
   (if (or (= :git-clone (first instructions))
           (and (.exists repo) (contains-repo repo)))
     (act-on-filesystem repo instructions)
