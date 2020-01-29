@@ -1,9 +1,9 @@
-(defproject com.atomist/clj-git-lib "0.3.4-SNAPSHOT"
+(defproject com.atomist/clj-git-lib "0.3.3-SNAPSHOT"
   :description "Small wrapper around jgit with some handy editing utilities"
   :url "https://github.com/atomisthq/clj-git-lib"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure               "1.10.1"]
+  :dependencies [[org.clojure/clojure               "1.8.0"]
                  [clj-jgit                          "0.8.10"]
                  [prismatic/schema "1.1.12"]
                  [org.clojure/tools.logging       "0.5.0"]

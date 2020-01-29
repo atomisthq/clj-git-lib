@@ -4,13 +4,13 @@
             [cheshire.core :as cheshire]
             [clojure.java.io :as io]
             [clojure.data.json :as json])
-  (:import (org.eclipse.jgit.api Git)
+  (:import [java.io File]
+           (org.eclipse.jgit.api Git)
            (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider RefSpec)
-           (org.eclipse.jgit.internal.storage.file FileRepository)
-           (java.io File)))
+           (org.eclipse.jgit.internal.storage.file FileRepository)))
 
 (defn contains-repo [f]
-  (let [dot-git (io/file f ".git")]
+  (let [dot-git (File. f ".git")]
     (and (.exists dot-git) (.isDirectory dot-git))))
 
 (defmulti perform-instruction
@@ -46,12 +46,12 @@
 (defmethod perform-instruction :mkdir
   [{params :params :as instr}]
   (let [{file-that-needs-a-home :for} params]
-    (io/make-parents (io/file (:repo instr) file-that-needs-a-home))))
+    (io/make-parents (File. (:repo instr) file-that-needs-a-home))))
 
 (defmethod perform-instruction :copy
   [{params :params :as instr}]
   (let [{from-file :from to-file :to} params]
-    (io/copy (io/file (:repo instr) from-file) (io/file (:repo instr) to-file))))
+    (io/copy (File. (:repo instr) from-file) (File. (:repo instr) to-file))))
 
 (defmethod perform-instruction :git-checkout
   [{params :params :as instr}]
@@ -79,13 +79,13 @@
   (let [{tag-message :message tag-name :name} params]
     (if (:oauth-token params)
       (->
-       (Git. (FileRepository. (io/file (:repo instr) "/.git")))
+       (Git. (FileRepository. (File. (:repo instr) "/.git")))
        (.tag)
        (.setName tag-name)
        (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
        (.call))
       (->
-       (Git. (FileRepository. (io/file (:repo instr) "/.git")))
+       (Git. (FileRepository. (File. (:repo instr) "/.git")))
        (.tag)
        (.setName tag-name)
        (.setMessage tag-message)
@@ -95,13 +95,13 @@
   [{params :params :as instr}]
   (if (:oauth-token params)
     (->
-     (Git. (FileRepository. (io/file (:repo instr) "/.git")))
+     (Git. (FileRepository. (File. (:repo instr) "/.git")))
      (.push)
      (.setRemote (:remote params))
      (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
      (.call))
     (->
-     (Git. (FileRepository. (io/file (:repo instr) "/.git")))
+     (Git. (FileRepository. (File. (:repo instr) "/.git")))
      (.push)
      (.setPushTags)
      (.setRemote (:remote params))
@@ -130,7 +130,7 @@
       (if (:try-fetch? params)
         (try
           (->
-           (Git. (FileRepository. (io/file (:repo instr) "/.git")))
+           (Git. (FileRepository. (File. (:repo instr) "/.git")))
            (.pull)
            (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
            (.setRebase true)
@@ -155,8 +155,9 @@
     (jgit/with-repo (:repo instr)
       (jgit/git-rm repo file-that-needs-deleting))))
 
+
 (defn act-on-filesystem
-  [^File repo instructions]
+  [^java.io.File repo instructions]
   (let [errors (remove nil? (map :error instructions))]
     (cond
       (seq errors) (throw (ex-info "Errors occurred" {:errors errors :instructions instructions}))
@@ -167,7 +168,7 @@
           (recur (nthrest instructions 2)))))))
 
 (defn perform
-  [^File repo & instructions]
+  [^java.io.File repo & instructions]
   (if (or (= :git-clone (first instructions))
           (and (.exists repo) (contains-repo repo)))
     (act-on-filesystem repo instructions)
@@ -179,7 +180,7 @@
 
 (defmethod edit :json
   [repo file-pattern editor]
-  (let [thefile (io/file repo file-pattern)]
+  (let [thefile (File. repo file-pattern)]
     (as->
      (slurp thefile) spec
       (json/read-str spec :key-fn keyword)
@@ -189,7 +190,7 @@
 
 (defmethod edit :slurp
   [repo file-pattern editor]
-  (->> (slurp (File. ^File repo ^String file-pattern))
+  (->> (slurp (File. repo file-pattern))
        (editor)
-       (spit (io/file repo file-pattern))))
+       (spit (File. repo file-pattern))))
 
