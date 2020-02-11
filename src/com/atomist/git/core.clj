@@ -197,7 +197,6 @@
        (editor)
        (spit (File. repo file-pattern))))
 
-
 (defn get-head-sha
   [^File repo]
   (ObjectId/toString (.getObjectId (.getRef (FileRepository. (File. repo "/.git")) "HEAD"))))
