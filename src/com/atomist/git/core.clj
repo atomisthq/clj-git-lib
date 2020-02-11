@@ -14,9 +14,9 @@
     (and (.exists dot-git) (.isDirectory dot-git))))
 
 (defmulti perform-instruction
-  "Do something to a git repo"
-  (fn [instr]
-    (:command instr)))
+          "Do something to a git repo"
+          (fn [instr]
+            (:command instr)))
 
 (defmulti edit (fn [_ file-pattern _]
                  (cond
@@ -57,22 +57,22 @@
   [{params :params :as instr}]
   (let [{:keys [branch]} params]
     (jgit/with-repo (:repo instr)
-      (jgit/git-checkout repo branch))))
+                    (jgit/git-checkout repo branch))))
 
 (defmethod perform-instruction :git-commit
   [{params :params :as instr}]
   (let [{commit-message :message name :name email :email} params]
     (jgit/with-repo (:repo instr)
-      (if (and name email)
-        (jgit/git-commit repo commit-message {:name name :email email})
-        (jgit/git-commit repo commit-message)))))
+                    (if (and name email)
+                      (jgit/git-commit repo commit-message {:name name :email email})
+                      (jgit/git-commit repo commit-message)))))
 
 (defmethod perform-instruction :git-branch-create
   [{params :params :as instr}]
   (let [{:keys [branch]} params]
     (jgit/with-repo (:repo instr)
-      (if branch
-        (jgit/git-branch-create repo branch)))))
+                    (if branch
+                      (jgit/git-branch-create repo branch)))))
 
 (defmethod perform-instruction :git-tag
   [{params :params :as instr}]
@@ -122,6 +122,7 @@
                 (Git/cloneRepository)
                  (.setDirectory (:repo instr))
                  (.setBranch (:branch params))
+                 (.setCloneAllBranches false)
                  (.setURI (str "https://github.com/" (:org params) "/" (:repo-name params) ".git"))
                  (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
                  (.call))]
@@ -133,7 +134,9 @@
            (Git. (FileRepository. (File. (:repo instr) "/.git")))
            (.pull)
            (.setCredentialsProvider (UsernamePasswordCredentialsProvider. "token" (str (:oauth-token params))))
-           (.setRebase true)
+           (.setRebase (if (some? (:rebase? params))
+                         (:rebase? params)
+                         true))
            (.call))
           (catch Exception e
             (if (:force? params)
@@ -147,13 +150,13 @@
   [{params :params :as instr}]
   (let [{file-that-needs-adding :file-pattern} params]
     (jgit/with-repo (:repo instr)
-      (jgit/git-add repo file-that-needs-adding))))
+                    (jgit/git-add repo file-that-needs-adding))))
 
 (defmethod perform-instruction :git-rm
   [{params :params :as instr}]
   (let [{file-that-needs-deleting :file-pattern} params]
     (jgit/with-repo (:repo instr)
-      (jgit/git-rm repo file-that-needs-deleting))))
+                    (jgit/git-rm repo file-that-needs-deleting))))
 
 (defn act-on-filesystem
   [^File repo instructions]
@@ -182,10 +185,10 @@
   (let [thefile (File. repo file-pattern)]
     (as->
      (slurp thefile) spec
-      (json/read-str spec :key-fn keyword)
-      (editor spec)
-      (cheshire/generate-string spec {:pretty true})
-      (spit thefile spec))))
+     (json/read-str spec :key-fn keyword)
+     (editor spec)
+     (cheshire/generate-string spec {:pretty true})
+     (spit thefile spec))))
 
 (defmethod edit :slurp
   [repo file-pattern editor]
