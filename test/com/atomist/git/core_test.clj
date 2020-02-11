@@ -17,6 +17,10 @@
                :git-add {:file-pattern "whatever.json"}
                :git-commit {:message "" :name "test" :email "test@test.com"}))))
 
-;(fresh-repo-add-and-commit)
+(deftest get-a-repo-hash
+  (testing "can fetch the current commit of a local repo"
+    (let [f (File. "./test-repo2")]
+      (jgit/git-init f)
+      (is (= "0000000000000000000000000000000000000000" (get-head-sha f))))))
 
 

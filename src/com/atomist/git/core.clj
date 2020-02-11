@@ -7,7 +7,8 @@
   (:import [java.io File]
            (org.eclipse.jgit.api Git)
            (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider RefSpec)
-           (org.eclipse.jgit.internal.storage.file FileRepository)))
+           (org.eclipse.jgit.internal.storage.file FileRepository)
+           (org.eclipse.jgit.lib ObjectId)))
 
 (defn contains-repo [f]
   (let [dot-git (File. f ".git")]
@@ -195,4 +196,9 @@
   (->> (slurp (File. repo file-pattern))
        (editor)
        (spit (File. repo file-pattern))))
+
+
+(defn get-head-sha
+  [^File repo]
+  (ObjectId/toString (.getObjectId (.getRef (FileRepository. (File. repo "/.git")) "HEAD"))))
 
