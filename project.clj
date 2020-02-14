@@ -1,4 +1,4 @@
-(defproject com.atomist/clj-git-lib "0.3.5-SNAPSHOT"
+(defproject com.atomist/clj-git-lib "0.3.6-SNAPSHOT"
   :description "Small wrapper around jgit with some handy editing utilities"
   :url "https://github.com/atomisthq/clj-git-lib"
   :license {:name "Eclipse Public License"

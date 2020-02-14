@@ -1,5 +1,6 @@
 (ns com.atomist.git.core
   (:require [clj-jgit.porcelain :as jgit]
+            [clj-jgit.querying :as query]
             [clojure.pprint :refer :all]
             [cheshire.core :as cheshire]
             [clojure.java.io :as io]
@@ -8,16 +9,17 @@
            (org.eclipse.jgit.api Git)
            (org.eclipse.jgit.transport UsernamePasswordCredentialsProvider RefSpec)
            (org.eclipse.jgit.internal.storage.file FileRepository)
-           (org.eclipse.jgit.lib ObjectId)))
+           (org.eclipse.jgit.lib ObjectId)
+           (org.eclipse.jgit.revwalk RevCommit)))
 
 (defn contains-repo [f]
   (let [dot-git (File. f ".git")]
     (and (.exists dot-git) (.isDirectory dot-git))))
 
 (defmulti perform-instruction
-  "Do something to a git repo"
-  (fn [instr]
-    (:command instr)))
+          "Do something to a git repo"
+          (fn [instr]
+            (:command instr)))
 
 (defmulti edit (fn [_ file-pattern _]
                  (cond
@@ -58,22 +60,22 @@
   [{params :params :as instr}]
   (let [{:keys [branch]} params]
     (jgit/with-repo (:repo instr)
-      (jgit/git-checkout repo branch))))
+                    (jgit/git-checkout repo branch))))
 
 (defmethod perform-instruction :git-commit
   [{params :params :as instr}]
   (let [{commit-message :message name :name email :email} params]
     (jgit/with-repo (:repo instr)
-      (if (and name email)
-        (jgit/git-commit repo commit-message {:name name :email email})
-        (jgit/git-commit repo commit-message)))))
+                    (if (and name email)
+                      (jgit/git-commit repo commit-message {:name name :email email})
+                      (jgit/git-commit repo commit-message)))))
 
 (defmethod perform-instruction :git-branch-create
   [{params :params :as instr}]
   (let [{:keys [branch]} params]
     (jgit/with-repo (:repo instr)
-      (if branch
-        (jgit/git-branch-create repo branch)))))
+                    (if branch
+                      (jgit/git-branch-create repo branch)))))
 
 (defmethod perform-instruction :git-tag
   [{params :params :as instr}]
@@ -151,13 +153,13 @@
   [{params :params :as instr}]
   (let [{file-that-needs-adding :file-pattern} params]
     (jgit/with-repo (:repo instr)
-      (jgit/git-add repo file-that-needs-adding))))
+                    (jgit/git-add repo file-that-needs-adding))))
 
 (defmethod perform-instruction :git-rm
   [{params :params :as instr}]
   (let [{file-that-needs-deleting :file-pattern} params]
     (jgit/with-repo (:repo instr)
-      (jgit/git-rm repo file-that-needs-deleting))))
+                    (jgit/git-rm repo file-that-needs-deleting))))
 
 (defn act-on-filesystem
   [^File repo instructions]
@@ -186,10 +188,10 @@
   (let [thefile (File. repo file-pattern)]
     (as->
      (slurp thefile) spec
-      (json/read-str spec :key-fn keyword)
-      (editor spec)
-      (cheshire/generate-string spec {:pretty true})
-      (spit thefile spec))))
+     (json/read-str spec :key-fn keyword)
+     (editor spec)
+     (cheshire/generate-string spec {:pretty true})
+     (spit thefile spec))))
 
 (defmethod edit :slurp
   [repo file-pattern editor]
@@ -201,3 +203,11 @@
   [^File repo]
   (ObjectId/toString (.getObjectId (.getRef (FileRepository. (File. repo "/.git")) "HEAD"))))
 
+(defn get-user-info
+  ([repo-dir]
+   (get-user-info repo-dir nil))
+  ([^File repo-dir sha-or-branch]
+   (let [ident (.getAuthorIdent (jgit/with-repo repo-dir
+                                                ^RevCommit (query/find-rev-commit repo rev-walk (or sha-or-branch "HEAD"))))]
+     {:name (.getName ident)
+      :email (.getEmailAddress ident)})))

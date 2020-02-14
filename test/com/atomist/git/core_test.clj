@@ -15,7 +15,10 @@
       (perform f
                :edit {:file-pattern "whatever.json" :editor editor}
                :git-add {:file-pattern "whatever.json"}
-               :git-commit {:message "" :name "test" :email "test@test.com"}))))
+               :git-commit {:message "" :name "test" :email "test@test.com"})
+      (is (= {:email "test@test.com"
+              :name "test"}
+             (get-user-info f))))))
 
 (deftest get-a-repo-hash
   (testing "can fetch the current commit of a local repo"
